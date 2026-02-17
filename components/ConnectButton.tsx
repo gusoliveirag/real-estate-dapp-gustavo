@@ -11,6 +11,7 @@ declare global {
 
 export default function ConnectButton() {
   const [currentAccount, setCurrentAccount] = useState<string>('')
+  const [isMounted, setIsMounted] = useState(false) // Resolve o erro de Hydration
 
   // Requests wallet connection
   const connectWallet = async () => {
@@ -30,6 +31,8 @@ export default function ConnectButton() {
 
   // Setup event listeners for account and network changes
   useEffect(() => {
+    setIsMounted(true) // Marca que o componente foi carregado no navegador
+
     if (typeof window !== 'undefined' && window.ethereum) {
       
       // Mandatory: Handle account switching
@@ -44,7 +47,10 @@ export default function ConnectButton() {
     }
   }, [])
 
-return (
+  // Se ainda não carregou no navegador, não renderiza nada (evita o erro)
+  if (!isMounted) return null;
+
+  return (
     <button 
       onClick={connectWallet} 
       className="px-6 py-2 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 shadow-md transition-all"
